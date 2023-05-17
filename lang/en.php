@@ -23,11 +23,13 @@ $_LANGUAGE = [
     'enter_your_email_or_username' => 'Enter your email or username',
     'credential_is_incorrect' => 'Credential is incorrect',
     'name_does_not_exist' => 'Name does not exist',
+    'name_can_not_be_same_domain_root' => 'Name can not be same domain root',
 
     'home' => 'Home',
     'users' => 'Users',
     'import' => 'Import',
     'export' => 'Export',
+    'export_to_app' => 'Export to App',
     'profile' => 'Profile',
     'logout' => 'Logout',
 
@@ -98,6 +100,7 @@ $_LANGUAGE = [
     'please_input_information' => 'Please input information',
     'does_not_match_password' => 'Password does not match with confirm password',
     'length_exceeded' => 'length exceeded',
+    'please_wait_for_the_upload_do_not_cancel' => 'Please wait for the upload, do not cancel. Thanks.',
     
     'star1' => 'Star 1',
     'star2' => 'Star 2',
@@ -124,6 +127,7 @@ $_LANGUAGE = [
     'successfully_imported' => 'Successfully imported',
 
     'product' => 'Product',
+    'products' => 'Products',
     'add_product' => 'Add Product',
     'edit_product' => 'Edit Product',
     'delete_product' => 'Delete Product',

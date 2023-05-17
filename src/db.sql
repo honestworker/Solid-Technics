@@ -7,15 +7,15 @@ DROP TABLE IF EXISTS `products`;
 CREATE TABLE `products` (
     `id` int(11) NOT NULL AUTO_INCREMENT,
     `user_id` int(10) unsigned NOT NULL,
-    `sku_no` varchar(10) NOT NULL,
-    `barcode` varchar(20) NOT NULL,
-    `description_1` varchar(20) DEFAULT NULL,
-    `description_2` varchar(20) DEFAULT NULL,
-    `brand` varchar(20) DEFAULT NULL,
-    `brand_sku` varchar(20) DEFAULT NULL,
-    `text_1` varchar(80) DEFAULT NULL,
-    `text_2` varchar(80) DEFAULT NULL,
-    `country` varchar(10) DEFAULT NULL,
+    `sku_no` varchar(20) NOT NULL,
+    `barcode` varchar(60) NOT NULL,
+    `description_1` varchar(60) DEFAULT NULL,
+    `description_2` varchar(60) DEFAULT NULL,
+    `brand` varchar(60) DEFAULT NULL,
+    `brand_sku` varchar(60) DEFAULT NULL,
+    `text_1` varchar(160) DEFAULT NULL,
+    `text_2` varchar(160) DEFAULT NULL,
+    `country` varchar(40) DEFAULT NULL,
     `pic_1` varchar(1023) DEFAULT NULL,
     `pic_2` varchar(1023) DEFAULT NULL,
     `pic_3` varchar(1023) DEFAULT NULL,
@@ -26,7 +26,7 @@ CREATE TABLE `products` (
     `updated_at` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00' ON UPDATE CURRENT_TIMESTAMP,
     PRIMARY KEY (`id`),
     KEY `user_id` (`user_id`),
-    CONSTRAINT `products_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`)
+    CONSTRAINT `products_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 DROP TABLE IF EXISTS `users`;
@@ -38,7 +38,7 @@ CREATE TABLE `users` (
     `password` varchar(511) NOT NULL,
     `additional_info` varchar(500) NOT NULL,
     `expiry_date` date NOT NULL,
-    `logo` text NOT NULL,
+    `logo` varchar(1023) NOT NULL,
     `level` enum('star1','star2','star3','star4','star5','admin') NOT NULL,
     `created_at` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
     `updated_at` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00' ON UPDATE CURRENT_TIMESTAMP,

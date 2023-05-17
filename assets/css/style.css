@@ -2,6 +2,20 @@
     background-color: rgba(0,0,0,0.5);
     z-index: 9999;
 }
+.page-spinner .spinner-message {
+    color: #ffffff;
+}
+
+.main-content {
+    padding: 0 15px;
+}
+@media (min-width: 768px) {
+    .main-content {
+        max-width: 90%;
+        padding: 0;
+        margin: auto;
+    }
+}
 
 .w-10-p {
     width: 10px;
@@ -49,4 +63,8 @@
 .navbar-nav .dropdown-menu {
     overflow-y: auto;
     min-width: 3rem;
+}
+.navbar-nav img {
+    height: 2.25rem;
+    width: auto;
 }

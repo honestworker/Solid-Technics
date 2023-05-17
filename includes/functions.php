@@ -66,7 +66,7 @@ if (!function_exists('set_env')) {
 }
 
 if (!function_exists('compress_image')) {
-    function compress_image($image, $max_width = 0, $max_size = 0, $to = '') {
+    function compress_image($image, $max_width = 0, $max_size = 0) {
         if ($max_width || $max_size) {
             if ($max_width) {
                 list($width, $height) = getimagesize($image);
@@ -75,54 +75,27 @@ if (!function_exists('compress_image')) {
                     $transparent_image = imagecreatetruecolor($max_width, $height * $max_width / $width);
                 
                     $info = getimagesize($image);
-                    if ($to) {
-                        switch($to) {
-                            case 'image/jpeg':
-                                $new_image = imagecreatefromjpeg($image);
-                                break;
-                            case 'image/png':
-                                $new_image = imagecreatefrompng($image);
-                                break;
-                            default:
-                                $new_image = imagecreatefromjpeg($image);
-                        }
-                    } else {
-                        switch($info['mime']) {
-                            case 'image/jpeg':
-                                $new_image = imagecreatefromjpeg($image);
-                                break;
-                            case 'image/png':
-                                $new_image = imagecreatefrompng($image);
-                                break;
-                            default:
-                                $new_image = imagecreatefromjpeg($image);
-                        }
+                    switch($info['mime']) {
+                        case 'image/jpeg':
+                            $new_image = imagecreatefromjpeg($image);
+                            break;
+                        case 'image/png':
+                            $new_image = imagecreatefrompng($image);
+                            break;
+                        default:
+                            $new_image = imagecreatefromjpeg($image);
                     }
 
                     imagecopyresampled($transparent_image, $new_image, 0, 0, 0, 0, $max_width, $height * $max_width / $width, $width, $height);
-
-                    if ($to) {
-                        switch($to) {
-                            case 'image/jpeg':
-                                imagejpeg($transparent_image, $image, 100);
-                                break;
-                            case 'image/png':
-                                imagepng($transparent_image, $image, 100);
-                                break;
-                            default:
-                                imagejpeg($transparent_image, $image, 100);
-                        }
-                    } else {
-                        switch($info['mime']) {
-                            case 'image/jpeg':
-                                imagejpeg($transparent_image, $image, 100);
-                                break;
-                            case 'image/png':
-                                imagepng($transparent_image, $image, 100);
-                                break;
-                            default:
-                                imagejpeg($transparent_image, $image, 100);
-                        }
+                    switch($info['mime']) {
+                        case 'image/jpeg':
+                            imagejpeg($transparent_image, $image, 100);
+                            break;
+                        case 'image/png':
+                            imagepng($transparent_image, $image, 100);
+                            break;
+                        default:
+                            imagejpeg($transparent_image, $image, 100);
                     }
                 }
             }
@@ -134,54 +107,27 @@ if (!function_exists('compress_image')) {
                     $transparent_image = imagecreatetruecolor($width, $height);
                 
                     $info = getimagesize($image);
-                    if ($to) {
-                        switch($to) {
-                            case 'image/jpeg':
-                                $new_image = imagecreatefromjpeg($image);
-                                break; 
-                            case 'image/png':
-                                $new_image = imagecreatefrompng($image);
-                                break; 
-                            default: 
-                                $new_image = imagecreatefromjpeg($image);
-                        }
-                    } else {
-                        switch($info['mime']) {
-                            case 'image/jpeg':
-                                $new_image = imagecreatefromjpeg($image);
-                                break; 
-                            case 'image/png':
-                                $new_image = imagecreatefrompng($image);
-                                break; 
-                            default: 
-                                $new_image = imagecreatefromjpeg($image);
-                        }
+                    switch($info['mime']) {
+                        case 'image/jpeg':
+                            $new_image = imagecreatefromjpeg($image);
+                            break; 
+                        case 'image/png':
+                            $new_image = imagecreatefrompng($image);
+                            break; 
+                        default: 
+                            $new_image = imagecreatefromjpeg($image);
                     }
                 
-                    imagecopyresampled($transparent_image, $new_image, 0, 0, 0, 0, $width, $height, $width, $height);
-                    
-                    if ($to) {
-                        switch($to) {
-                            case 'image/jpeg':
-                                imagejpeg($transparent_image, $image, $max_size / $image_size * 100);
-                                break;
-                            case 'image/png':
-                                imagepng($transparent_image, $image, $max_size / $image_size * 100);
-                                break;
-                            default:
-                                imagejpeg($transparent_image, $image, $max_size / $image_size * 100);
-                        }
-                    } else {
-                        switch($info['mime']) {
-                            case 'image/jpeg':
-                                imagejpeg($transparent_image, $image, $max_size / $image_size * 100);
-                                break;
-                            case 'image/png':
-                                imagepng($transparent_image, $image, $max_size / $image_size * 100);
-                                break;
-                            default:
-                                imagejpeg($transparent_image, $image, $max_size / $image_size * 100);
-                        }
+                    imagecopyresampled($transparent_image, $new_image, 0, 0, 0, 0, $width, $height, $width, $height);                    
+                    switch($info['mime']) {
+                        case 'image/jpeg':
+                            imagejpeg($transparent_image, $image, $max_size / $image_size * 100);
+                            break;
+                        case 'image/png':
+                            imagepng($transparent_image, $image, $max_size / $image_size * 100);
+                            break;
+                        default:
+                            imagejpeg($transparent_image, $image, $max_size / $image_size * 100);
                     }
                 }
             }
@@ -233,4 +179,82 @@ if (!function_exists('format_size')) {
     }
 }
 
+if (!function_exists('get_media_name')) {
+    function get_media_name($media, $user_name) {
+        $media_ext = pathinfo($media, PATHINFO_EXTENSION);
+        $media_name = basename($media, "." . $media_ext);
+        $check_media = $media_name . "." . $media_ext;
+        $media_suffix = 0;
+        $media_check = false;
+        while (!$media_check) {
+            $check_media = $media_name . "." . $media_ext;
+            if ($media_suffix) {
+                $check_media = $media_name . '_' . $media_suffix . "." . $media_ext;
+            }
+            if (!file_exists(".." . DIRECTORY_SEPARATOR . $user_name . DIRECTORY_SEPARATOR . MEDIA_PATH . DIRECTORY_SEPARATOR . $check_media)) {
+                $media_check = true;
+            }
+            $media_suffix += 1;
+        }
+        return $check_media;
+    }
+}
+
+if (!function_exists('check_product_media')) {
+    function check_product_media() {
+        $products_sql = "SELECT `products`.`id`, `products`.`pic_1`, `products`.`pic_2`, `products`.`pic_3`, `products`.`pic_4`, `products`.`video_1`, `products`.`video_2`, `users`.`name` as 'user_name' FROM `products` LEFT JOIN `users` ON `products`.`user_id` = `users`.`id`";
+        $products_sql_result = $db_conn->query($products_sql);
+        $products[] = [];
+        if ($products_sql_result->num_rows) {
+            while ($product = $products_sql_result->fetch_assoc()) {
+                $products[] = $product;
+            }
+        }
+        foreach ($products as $product) {
+            $pic_1_name = $product['pic_1'];
+            if (!file_exists(".." . DIRECTORY_SEPARATOR . $product['user_name'] . DIRECTORY_SEPARATOR . MEDIA_PATH . DIRECTORY_SEPARATOR . $pic_1_name)) {
+                $pic_1_name = TRANSPARENT_PNG_NAME;
+            }
+            $pic_2_name = $product['pic_2'];
+            if (!file_exists(".." . DIRECTORY_SEPARATOR . $product['user_name'] . DIRECTORY_SEPARATOR . MEDIA_PATH . DIRECTORY_SEPARATOR . $pic_2_name)) {
+                $pic_2_name = TRANSPARENT_PNG_NAME;
+            }
+            $pic_3_name = $product['pic_3'];
+            if (!file_exists(".." . DIRECTORY_SEPARATOR . $product['user_name'] . DIRECTORY_SEPARATOR . MEDIA_PATH . DIRECTORY_SEPARATOR . $pic_3_name)) {
+                $pic_3_name = TRANSPARENT_PNG_NAME;
+            }
+            $pic_4_name = $product['pic_4'];
+            if (!file_exists(".." . DIRECTORY_SEPARATOR . $product['user_name'] . DIRECTORY_SEPARATOR . MEDIA_PATH . DIRECTORY_SEPARATOR . $pic_4_name)) {
+                $pic_4_name = TRANSPARENT_PNG_NAME;
+            }
+            $video_1_name = $product['video_1'];
+            if (!file_exists(".." . DIRECTORY_SEPARATOR . $product['user_name'] . DIRECTORY_SEPARATOR . MEDIA_PATH . DIRECTORY_SEPARATOR . $video_1_name)) {
+                $video_1_name = '';
+            }
+            $video_2_name = $product['video_2'];
+            if (!file_exists(".." . DIRECTORY_SEPARATOR . $product['user_name'] . DIRECTORY_SEPARATOR . MEDIA_PATH . DIRECTORY_SEPARATOR . $video_2_name)) {
+                $video_2_name = '';
+            }
+            $product_sql = "UPDATE `products` SET `pic_1`='" . $pic_1_name . "', `pic_2`='" . $pic_2_name . "', `pic_3`='" . $pic_3_name . "', `pic_4`='" . $pic_4_name . "'";
+            $product_sql .= ", `video_1`='" . $video_1_name . "', `video_2`='" . $video_2_name . "'";
+            $product_sql .= " WHERE `id` = '" . $product['id'] . "'";
+            $db_conn->query($product_sql);
+        }
+    }
+}
+
+if (!function_exists('rrmdir')) {
+    function rrmdir($dir) {
+        foreach(glob($dir . '/*') as $file) {
+            if ($file != '.' && $file != '..') {
+                if (is_dir($file)) {
+                    rrmdir($file);
+                } else {
+                    unlink($file);
+                }
+            }
+        }
+        rmdir($dir); 
+    }
+}
 ?>

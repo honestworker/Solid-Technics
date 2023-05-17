@@ -21,11 +21,11 @@ foreach ($lang_files as $lang_file) {
 }
 
 $lang = "en";
-if (!isset($_SESSION['lang'])) { 
+if (!isset($_SESSION['lang'])) {
     $_SESSION['lang'] = 'en';
 }
-require_once("./lang/" . $_SESSION['lang'] . ".php");
-if (!isset($_SESSION['direction'])) { 
+require_once dirname(__FILE__) . "/../lang/" . $_SESSION['lang'] . ".php";
+if (!isset($_SESSION['direction'])) {
     $_SESSION['direction'] = 'ltr';
 }
 
@@ -64,4 +64,15 @@ foreach ($video_allows as $video_index => $video_allow) {
     $video_allows[$video_index] = 'video/' . $video_allow;
 }
 
+if (isset($_SESSION['user'])) {
+    $user_sql = "SELECT * FROM `users` WHERE `id`='" . $_SESSION['user']['id'] . "';";
+    $sql_result = $db_conn->query($user_sql);
+    if ($sql_result->num_rows) {
+        $user_row = $sql_result->fetch_assoc();
+        $_SESSION['user']['level'] = $user_row['level'];
+    }
+}
+
+require_once dirname(__FILE__) . '/../library/captcha/captcha-session.class.php';
+require_once dirname(__FILE__) . '/../library/captcha/captcha.class.php';
 ?>

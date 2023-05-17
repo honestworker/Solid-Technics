@@ -43,10 +43,15 @@ if ($action) {
                     'pic_2' => ($product_row['pic_2']) ? (DOMAIN_NAME . DIRECTORY_SEPARATOR . (($product_row['pic_2'] == TRANSPARENT_PNG_NAME) ? (DOMAIN_ROOT . DIRECTORY_SEPARATOR . TRANSPARENT_PNG_PATH . DIRECTORY_SEPARATOR . TRANSPARENT_PNG_NAME) : ($product_row['user_name'] . DIRECTORY_SEPARATOR . MEDIA_PATH . DIRECTORY_SEPARATOR . $product_row['pic_2']))) . "?v=" . time() : '',
                     'pic_3' => ($product_row['pic_3']) ? (DOMAIN_NAME . DIRECTORY_SEPARATOR . (($product_row['pic_3'] == TRANSPARENT_PNG_NAME) ? (DOMAIN_ROOT . DIRECTORY_SEPARATOR . TRANSPARENT_PNG_PATH . DIRECTORY_SEPARATOR . TRANSPARENT_PNG_NAME) : ($product_row['user_name'] . DIRECTORY_SEPARATOR . MEDIA_PATH . DIRECTORY_SEPARATOR . $product_row['pic_3']))) . "?v=" . time() : '',
                     'pic_4' => ($product_row['pic_4']) ? (DOMAIN_NAME . DIRECTORY_SEPARATOR . (($product_row['pic_4'] == TRANSPARENT_PNG_NAME) ? (DOMAIN_ROOT . DIRECTORY_SEPARATOR . TRANSPARENT_PNG_PATH . DIRECTORY_SEPARATOR . TRANSPARENT_PNG_NAME) : ($product_row['user_name'] . DIRECTORY_SEPARATOR . MEDIA_PATH . DIRECTORY_SEPARATOR . $product_row['pic_4']))) . "?v=" . time() : '',
+                    'pic_1_transparent' => ($product_row['pic_1']) ? ($product_row['pic_1'] == TRANSPARENT_PNG_NAME ? true : false) : true,
+                    'pic_2_transparent' => ($product_row['pic_2']) ? ($product_row['pic_2'] == TRANSPARENT_PNG_NAME ? true : false) : true,
+                    'pic_3_transparent' => ($product_row['pic_3']) ? ($product_row['pic_3'] == TRANSPARENT_PNG_NAME ? true : false) : true,
+                    'pic_4_transparent' => ($product_row['pic_4']) ? ($product_row['pic_4'] == TRANSPARENT_PNG_NAME ? true : false) : true,
                     'video_1' => $product_row['video_1'],
                     'video_2' => $product_row['video_2'],
                 ];
             }
+
             break;
         
         case 'update-product':
@@ -61,6 +66,7 @@ if ($action) {
             $has_error = false;
             $user_id = $_SESSION["user"]['id'];
             $user_name = $_SESSION["user"]['name'];
+            
             if ($_POST['id']) {
                 $products_sql = "SELECT * FROM `products` WHERE `id`='" . $_POST['id'] . "'";
                 $products_sql_result = $db_conn->query($products_sql);
@@ -68,6 +74,7 @@ if ($action) {
                     $product_row = $products_sql_result->fetch_assoc();
                     if ($_SESSION["user"]['level'] == 'admin') {
                         $user_id = $product_row['user_id'];
+
                         $users_sql = "SELECT * FROM `users` WHERE `id`='" . $user_id . "'";
                         $users_sql_result = $db_conn->query($users_sql);
                         if ($users_sql_result->num_rows) {
@@ -76,11 +83,29 @@ if ($action) {
                         }
                     }
                     $pic_1_name = $product_row['pic_1'];
+                    if (!file_exists(".." . DIRECTORY_SEPARATOR . $user_name . DIRECTORY_SEPARATOR . MEDIA_PATH . DIRECTORY_SEPARATOR . $pic_1_name)) {
+                        $pic_1_name = TRANSPARENT_PNG_NAME;
+                    }
                     $pic_2_name = $product_row['pic_2'];
+                    if (!file_exists(".." . DIRECTORY_SEPARATOR . $user_name . DIRECTORY_SEPARATOR . MEDIA_PATH . DIRECTORY_SEPARATOR . $pic_2_name)) {
+                        $pic_2_name = TRANSPARENT_PNG_NAME;
+                    }
                     $pic_3_name = $product_row['pic_3'];
+                    if (!file_exists(".." . DIRECTORY_SEPARATOR . $user_name . DIRECTORY_SEPARATOR . MEDIA_PATH . DIRECTORY_SEPARATOR . $pic_3_name)) {
+                        $pic_3_name = TRANSPARENT_PNG_NAME;
+                    }
                     $pic_4_name = $product_row['pic_4'];
+                    if (!file_exists(".." . DIRECTORY_SEPARATOR . $user_name . DIRECTORY_SEPARATOR . MEDIA_PATH . DIRECTORY_SEPARATOR . $pic_4_name)) {
+                        $pic_4_name = TRANSPARENT_PNG_NAME;
+                    }
                     $video_1_name = $product_row['video_1'];
+                    if (!file_exists(".." . DIRECTORY_SEPARATOR . $user_name . DIRECTORY_SEPARATOR . MEDIA_PATH . DIRECTORY_SEPARATOR . $video_1_name)) {
+                        $video_1_name = '';
+                    }
                     $video_2_name = $product_row['video_2'];
+                    if (!file_exists(".." . DIRECTORY_SEPARATOR . $user_name . DIRECTORY_SEPARATOR . MEDIA_PATH . DIRECTORY_SEPARATOR . $video_2_name)) {
+                        $video_2_name = '';
+                    }
                 }
             }
 
@@ -111,7 +136,7 @@ if ($action) {
                     $response['errors']['sku_no'] = $_LANGUAGE['please_match'] . " " . $_LANGUAGE['sku_no'] . " (" . "/^[0-9a-zA-Z_-]{1,10}$/i" . ")";
                     $has_error = true;
                 } else {
-                    $products_sql = "SELECT * FROM `products` WHERE `sku_no`='" . $_POST['sku_no'] . "'";
+                    $products_sql = "SELECT * FROM `products` WHERE `sku_no`='" . $_POST['sku_no'] . "' AND `user_id`='" . $user_id . "'";
                     if ($_POST['id']) {
                         $products_sql .= " AND `id` !='" . $_POST['id'] . "'";
                     }
@@ -126,15 +151,15 @@ if ($action) {
                 $has_error = true;
             }
             if ($_POST['barcode']) {
-                if (!preg_match("/^[0-9]{1,20}$/i", $_POST['barcode'])) {
-                    $response['errors']['barcode'] = $_LANGUAGE['please_match'] . " " . $_LANGUAGE['barcode'] . " (" . "/^[0-9]{1,20}$/i" . ")";
+                if (!preg_match("/^[0-9]{1,30}$/i", $_POST['barcode'])) {
+                    $response['errors']['barcode'] = $_LANGUAGE['please_match'] . " " . $_LANGUAGE['barcode'] . " (" . "/^[0-9]{1,30}$/i" . ")";
                     $has_error = true;
                 } else {
-                    $products_sql = "SELECT * FROM `products` WHERE `barcode`='" . $_POST['barcode'] . "'";
+                    $products_sql = "SELECT * FROM `products` WHERE `barcode`='" . $_POST['barcode'] . "' AND `user_id`='" . $user_id . "'";
                     if ($_POST['id']) {
                         $products_sql .= " AND `id` !='" . $_POST['id'] . "'";
                     }
-                    $products_sql_result = $db_conn->query($products_sql);
+                    $products_sql_result = $db_conn->query($products_sql);                    
                     if ($products_sql_result->num_rows) {
                         $response['errors']['barcode'] = $_LANGUAGE['barcode_already_exist'];
                         $has_error = true;
@@ -148,7 +173,7 @@ if ($action) {
                 $response['errors']['description_1'] = $_LANGUAGE['please_input_description_1'];
                 $has_error = true;
             } else {
-                if (strlen($_POST['description_1']) > 20) {
+                if (mb_strlen($_POST['description_1']) > 30) {
                     $response['errors']['description_1'] = $_LANGUAGE['description_1'] . ' ' . $_LANGUAGE['length_exceeded'];
                     $has_error = true;
                 }
@@ -157,7 +182,7 @@ if ($action) {
                 $response['errors']['description_2'] = $_LANGUAGE['please_input_description_2'];
                 $has_error = true;
             } else {
-                if (strlen($_POST['description_2']) > 20) {
+                if (mb_strlen($_POST['description_2']) > 30) {
                     $response['errors']['description_2'] = $_LANGUAGE['description_2'] . ' ' . $_LANGUAGE['length_exceeded'];
                     $has_error = true;
                 }
@@ -166,7 +191,7 @@ if ($action) {
                 $response['errors']['brand'] = $_LANGUAGE['please_input_brand'];
                 $has_error = true;
             } else {
-                if (strlen($_POST['brand']) > 20) {
+                if (mb_strlen($_POST['brand']) > 30) {
                     $response['errors']['brand'] = $_LANGUAGE['brand'] . ' ' . $_LANGUAGE['length_exceeded'];
                     $has_error = true;
                 }
@@ -175,7 +200,7 @@ if ($action) {
                 $response['errors']['brand_sku'] = $_LANGUAGE['please_input_brand_sku'];
                 $has_error = true;
             } else {
-                if (strlen($_POST['brand_sku']) > 20) {
+                if (mb_strlen($_POST['brand_sku']) > 30) {
                     $response['errors']['brand_sku'] = $_LANGUAGE['brand_sku'] . ' ' . $_LANGUAGE['length_exceeded'];
                     $has_error = true;
                 }
@@ -184,7 +209,7 @@ if ($action) {
                 $response['errors']['text_1'] = $_LANGUAGE['please_input_text_1'];
                 $has_error = true;
             } else {
-                if (strlen($_POST['text_1']) > 80) {
+                if (mb_strlen($_POST['text_1']) > 80) {
                     $response['errors']['text_1'] = $_LANGUAGE['text_1'] . ' ' . $_LANGUAGE['length_exceeded'];
                     $has_error = true;
                 }
@@ -193,7 +218,7 @@ if ($action) {
                 $response['errors']['text_2'] = $_LANGUAGE['please_input_text_2'];
                 $has_error = true;
             } else {
-                if (strlen($_POST['text_2']) > 80) {
+                if (mb_strlen($_POST['text_2']) > 80) {
                     $response['errors']['text_2'] = $_LANGUAGE['text_2'] . ' ' . $_LANGUAGE['length_exceeded'];
                     $has_error = true;
                 }
@@ -202,7 +227,7 @@ if ($action) {
                 $response['errors']['country'] = $_LANGUAGE['please_input_country'];
                 $has_error = true;
             } else {
-                if (strlen($_POST['country']) > 10) {
+                if (mb_strlen($_POST['country']) > 20) {
                     $response['errors']['country'] = $_LANGUAGE['country'] . ' ' . $_LANGUAGE['length_exceeded'];
                     $has_error = true;
                 }
@@ -223,6 +248,15 @@ if ($action) {
                     }
                     if (!$has_error) {
                         $pic_1_name = basename($_FILES['pic_1']['name']);
+                        $products_sql = "SELECT * FROM `products` WHERE `pic_1`='" . $pic_1_name . "' AND `user_id`='" . $user_id . "'";
+                        if ($_POST['id']) {
+                            $products_sql .= " AND `id` !='" . $_POST['id'] . "'";
+                        }
+                        $products_sql_result = $db_conn->query($products_sql);
+                        if ($products_sql_result->num_rows) {
+                            $pic_1_name = get_media_name($pic_1_name, $user_name);
+                        }
+                        if ($pic_1_name == TRANSPARENT_PNG_NAME) get_media_name($pic_1_name, $user_name);
                         $pic_1_path = $user_name . DIRECTORY_SEPARATOR . MEDIA_PATH . DIRECTORY_SEPARATOR . $pic_1_name;
                         $uploaded_size += min($pic_1_file_size, PIC_MAX_SIZE * 1024 * 1024);
                         move_uploaded_file($_FILES['pic_1']['tmp_name'], ".." . DIRECTORY_SEPARATOR . $pic_1_path);
@@ -249,6 +283,15 @@ if ($action) {
                     }
                     if (!$has_error) {
                         $pic_2_name = basename($_FILES['pic_2']['name']);
+                        $products_sql = "SELECT * FROM `products` WHERE `pic_2`='" . $pic_2_name . "' AND `user_id`='" . $user_id . "'";
+                        if ($_POST['id']) {
+                            $products_sql .= " AND `id` !='" . $_POST['id'] . "'";
+                        }
+                        $products_sql_result = $db_conn->query($products_sql);
+                        if ($products_sql_result->num_rows) {
+                            $pic_2_name = get_media_name($pic_2_name, $user_name);
+                        }
+                        if ($pic_2_name == TRANSPARENT_PNG_NAME) get_media_name($pic_2_name, $user_name);
                         $pic_2_path = $user_name . DIRECTORY_SEPARATOR . MEDIA_PATH . DIRECTORY_SEPARATOR . $pic_2_name;
                         $uploaded_size += min($pic_2_file_size, PIC_MAX_SIZE * 1024 * 1024);
                         move_uploaded_file($_FILES['pic_2']['tmp_name'], ".." . DIRECTORY_SEPARATOR . $pic_2_path);
@@ -275,6 +318,15 @@ if ($action) {
                     }
                     if (!$has_error) {
                         $pic_3_name = basename($_FILES['pic_3']['name']);
+                        $products_sql = "SELECT * FROM `products` WHERE `pic_3`='" . $pic_3_name . "' AND `user_id`='" . $user_id . "'";
+                        if ($_POST['id']) {
+                            $products_sql .= " AND `id` !='" . $_POST['id'] . "'";
+                        }
+                        $products_sql_result = $db_conn->query($products_sql);
+                        if ($products_sql_result->num_rows) {
+                            $pic_3_name = get_media_name($pic_3_name, $user_name);
+                        }
+                        if ($pic_3_name == TRANSPARENT_PNG_NAME) get_media_name($pic_3_name, $user_name);
                         $pic_3_path = $user_name . DIRECTORY_SEPARATOR . MEDIA_PATH . DIRECTORY_SEPARATOR . $pic_3_name;
                         $uploaded_size += min($pic_3_file_size, PIC_MAX_SIZE * 1024 * 1024);
                         move_uploaded_file($_FILES['pic_3']['tmp_name'], ".." . DIRECTORY_SEPARATOR . $pic_3_path);
@@ -301,6 +353,15 @@ if ($action) {
                     }
                     if (!$has_error) {
                         $pic_4_name = basename($_FILES['pic_4']['name']);
+                        $products_sql = "SELECT * FROM `products` WHERE `pic_4`='" . $pic_4_name . "' AND `user_id`='" . $user_id . "'";
+                        if ($_POST['id']) {
+                            $products_sql .= " AND `id` !='" . $_POST['id'] . "'";
+                        }
+                        $products_sql_result = $db_conn->query($products_sql);
+                        if ($products_sql_result->num_rows) {
+                            $pic_4_name = get_media_name($pic_4_name, $user_name);
+                        }
+                        if ($pic_4_name == TRANSPARENT_PNG_NAME) get_media_name($pic_4_name, $user_name);
                         $pic_4_path = $user_name . DIRECTORY_SEPARATOR . MEDIA_PATH . DIRECTORY_SEPARATOR . $pic_4_name;
                         $uploaded_size += min($pic_4_file_size, PIC_MAX_SIZE * 1024 * 1024);
                         move_uploaded_file($_FILES['pic_4']['tmp_name'], ".." . DIRECTORY_SEPARATOR . $pic_4_path);
@@ -375,6 +436,7 @@ if ($action) {
                 
                 $response['status'] = true;
             }
+
             break;
         
         case 'delete-product':
@@ -446,83 +508,108 @@ if ($action) {
                 $import_rows = [];
                 $open = fopen("." . DIRECTORY_SEPARATOR . $import_path, "r");
                 if (($import_open = fopen("." . DIRECTORY_SEPARATOR . $import_path, "r")) !== FALSE) {
-                    while (($import_data = fgetcsv($import_open, 1000, ";")) !== FALSE) {
-                        $import_rows[] = $import_data; 
+                    while (($import_data = fgets($import_open)) !== false) {
+                        $import_rows[] = explode(';', $import_data);
                     }
                 
                     fclose($import_open);
                 }
                 
                 $imported_products = 0;
-                $user_id = 0;
+                $user_id = $_SESSION['user']['id'];
+                $user_name = $_SESSION['user']['name'];
                 $product_id = 0;
                 foreach ($import_rows as $import_index => $import_row) {
                     $has_error = false;
                     if (!$import_index) continue;
-                    if (count($import_row) < 16) continue;
-                    if ($import_row[0]) {
-                        $user_name = str_replace("-", "", str_replace("_", "", str_replace(" ", "", strtolower($import_row[0]))));
-                        $users_sql = "SELECT * FROM `users` WHERE `name`='" . $import_row[0] . "'";
-                        $users_sql_result = $db_conn->query($users_sql);
-                        if ($users_sql_result->num_rows) {
-                            $user_row = $users_sql_result->fetch_assoc();
-                            $user_id = $user_row['id'];
-                        } else {
-                            $has_error = true;
-                        }
-                    } else {
-                        $has_error = true;
-                    }
-                    if (!$import_row[1] || strlen($import_row[1]) > 10 || !preg_match("/^[0-9a-zA-Z_-]{1,10}$/i", $import_row[1])) {
+                    if (count($import_row) != 15) continue;
+
+                    $sku_no = mb_substr($import_row[0], 0, 10);
+                    if (!$sku_no || !preg_match("/^[0-9a-zA-Z_-]{1,10}$/i", $sku_no)) {
                         $has_error = true;
                     } else {
-                        $products_sql = "SELECT * FROM `products` WHERE `sku_no`='" . $import_row[1] . "'";
+                        $products_sql = "SELECT * FROM `products` WHERE `sku_no`='" . $sku_no . "' AND `user_id`='" . $user_id . "'";
                         $products_sql_result = $db_conn->query($products_sql);
                         if ($products_sql_result->num_rows) {
                             $product_row = $products_sql_result->fetch_assoc();
                             $product_id = $product_row['id'];
                         }
                     }
-                    if (!$import_row[2] || strlen($import_row[2]) > 20 || !preg_match("/^[0-9]{1,20}$/i", $import_row[2])) {
+                    
+                    $barcode = mb_substr($import_row[0], 0, 30);
+                    if (!$barcode || !preg_match("/^[0-9]{1,30}$/i", $barcode)) {
                         $has_error = true;
                     } else {
-                        $products_sql = "SELECT * FROM `products` WHERE `barcode`='" . $import_row[2] . "'";
+                        $products_sql = "SELECT * FROM `products` WHERE `barcode`='" . $barcode . "' AND `user_id`='" . $user_id . "'";
                         $products_sql_result = $db_conn->query($products_sql);
                         if ($products_sql_result->num_rows) {
                             $product_row = $products_sql_result->fetch_assoc();
                             $product_id = $product_row['id'];
                         }
                     }
-                    if (!$import_row[3] || strlen($import_row[3]) > 20 || !$import_row[4] || strlen($import_row[4]) > 20) {
-                        $has_error = true;
+
+                    $description_1 = mb_substr($import_row[2], 0, 30);
+                    $description_2 = mb_substr($import_row[3], 0, 30);
+                    $brand = mb_substr($import_row[4], 0, 30);
+                    $brand_sku = mb_substr($import_row[5], 0, 30);
+                    $text_1 = mb_substr($import_row[6], 0, 80);
+                    $text_2 = mb_substr($import_row[7], 0, 80);
+                    $country = mb_substr($import_row[8], 0, 20);
+                    $pic_1 = $import_row[9];
+                    if (!$pic_1) {
+                        $pic_1 = TRANSPARENT_PNG_NAME;
+                    } else {
+                        if (!file_exists(".." . DIRECTORY_SEPARATOR . $user_name . DIRECTORY_SEPARATOR . MEDIA_PATH . DIRECTORY_SEPARATOR . $pic_1)) {
+                            $pic_1 = TRANSPARENT_PNG_NAME;
+                        }
                     }
-                    if (!$import_row[5] || strlen($import_row[5]) > 20 || !$import_row[6] || strlen($import_row[6]) > 20) {
-                        $has_error = true;
+                    $pic_2 = $import_row[10];
+                    if (!$pic_2) {
+                        $pic_2 = TRANSPARENT_PNG_NAME;
+                    } else {
+                        if (!file_exists(".." . DIRECTORY_SEPARATOR . $user_name . DIRECTORY_SEPARATOR . MEDIA_PATH . DIRECTORY_SEPARATOR . $pic_2)) {
+                            $pic_2 = TRANSPARENT_PNG_NAME;
+                        }
                     }
-                    if (!$import_row[7] || strlen($import_row[7]) > 80 || !$import_row[8] || strlen($import_row[8]) > 80) {
-                        $has_error = true;
+                    $pic_3 = $import_row[11];
+                    if (!$pic_3) {
+                        $pic_3 = TRANSPARENT_PNG_NAME;
+                    } else {
+                        if (!file_exists(".." . DIRECTORY_SEPARATOR . $user_name . DIRECTORY_SEPARATOR . MEDIA_PATH . DIRECTORY_SEPARATOR . $pic_3)) {
+                            $pic_3 = TRANSPARENT_PNG_NAME;
+                        }
                     }
-                    if (!$import_row[9] || strlen($import_row[9]) > 10) {
-                        $has_error = true;
+                    $pic_4 = $import_row[12];
+                    if (!$pic_4) {
+                        $pic_4 = TRANSPARENT_PNG_NAME;
+                    } else {
+                        if (!file_exists(".." . DIRECTORY_SEPARATOR . $user_name . DIRECTORY_SEPARATOR . MEDIA_PATH . DIRECTORY_SEPARATOR . $pic_4)) {
+                            $pic_4 = TRANSPARENT_PNG_NAME;
+                        }
                     }
-                    if (!$import_row[10] || !$import_row[11] || !$import_row[12] || !$import_row[13]) {
-                        $has_error = true;
+                    $video_1 = $import_row[13];
+                    if (!file_exists(".." . DIRECTORY_SEPARATOR . $user_name . DIRECTORY_SEPARATOR . MEDIA_PATH . DIRECTORY_SEPARATOR . $video_1)) {
+                        $video_1 = '';
+                    }
+                    $video_2 = $import_row[14];
+                    if (!file_exists(".." . DIRECTORY_SEPARATOR . $user_name . DIRECTORY_SEPARATOR . MEDIA_PATH . DIRECTORY_SEPARATOR . $video_2)) {
+                        $video_2 = '';
                     }
                     if (!$has_error) {
                         if ($product_id) {
-                            $product_sql = "UPDATE `products` SET `sku_no`='" . $import_row[1] . "', `barcode`='" . $import_row[2] . "'";
-                            $product_sql .= ", `description_1`='" . str_replace(";", "", $import_row[3]) . "', `description_2`='" . str_replace(";", "", $import_row[4]) . "', `brand`='" . str_replace(";", "", $import_row[5]) . "'";
-                            $product_sql .= ", `brand_sku`='" . str_replace(";", "", $import_row[6]) . "', `text_1`='" . str_replace(";", "", $import_row[7]) . "', `text_2`='" . str_replace(";", "", $import_row[8]) . "', `country`='" . str_replace(";", "", $import_row[9]) . "'";
-                            $product_sql .= ", `pic_1`='" . str_replace(";", "", $import_row[10]) . "', `pic_2`='" . str_replace(";", "", $import_row[11]) . "', `pic_3`='" . str_replace(";", "", $import_row[12]) . "', `pic_4`='" . str_replace(";", "", $import_row[13]) . "'";
-                            $product_sql .= ", `video_1`='" . str_replace(";", "", $import_row[14]) . "', `video_2`='" . str_replace(";", "", $import_row[15]) . "'";
+                            $product_sql = "UPDATE `products` SET `sku_no`='" . $sku_no . "', `barcode`='" . $barcode . "'";
+                            $product_sql .= ", `description_1`='" . $description_1 . "', `description_2`='" . $description_2 . "', `brand`='" . $brand . "'";
+                            $product_sql .= ", `brand_sku`='" . $brand_sku . "', `text_1`='" . $text_1 . "', `text_2`='" . $text_2 . "', `country`='" . $country . "'";
+                            $product_sql .= ", `pic_1`='" . $pic_1 . "', `pic_2`='" . $pic_2 . "', `pic_3`='" . $pic_3 . "', `pic_4`='" . $pic_4 . "'";
+                            $product_sql .= ", `video_1`='" . $video_1 . "', `video_2`='" . $video_2 . "'";
                             $product_sql .= " WHERE `id` = '" . $product_id . "'";
                             $db_conn->query($product_sql);
                         } else {
                             $product_sql = "INSERT INTO `products` (`user_id`, `sku_no`, `barcode`, `description_1`, `description_2`, `brand`, `brand_sku`, `text_1`, `text_2`, `country`, `pic_1`, `pic_2`, `pic_3`, `pic_4`, `video_1`, `video_2`)";
-                            $product_sql .= " VALUES ('" . $user_id . "', '" . str_replace(";", "", $import_row[1]) . "', '" . str_replace(";", "", $import_row[2]) . "', '" . str_replace(";", "", $import_row[3]) . "', '" . str_replace(";", "", $import_row[4]) . "'";
-                            $product_sql .= ", '" . str_replace(";", "", $import_row[5]) . "', '" . str_replace(";", "", $import_row[6]) . "', '" . str_replace(";", "", $import_row[7]) . "', '" . str_replace(";", "", $import_row[8]) . "'";
-                            $product_sql .= ", '" . str_replace(";", "", $import_row[9]) . "', '" . str_replace(";", "", $import_row[10]) . "', '" . str_replace(";", "", $import_row[11]) . "', '" . str_replace(";", "", $import_row[12]) . "', '" . str_replace(";", "", $import_row[13]) . "'";
-                            $product_sql .= ", '" . str_replace(";", "", $import_row[14]) . "', '" . str_replace(";", "", $import_row[15]) . "')";
+                            $product_sql .= " VALUES ('" . $user_id . "', '" . $sku_no . "', '" . $barcode . "', '" . $description_1 . "', '" . $description_2 . "'";
+                            $product_sql .= ", '" . $brand . "', '" . $brand_sku . "', '" . $text_1 . "', '" . $text_2 . "'";
+                            $product_sql .= ", '" . $country . "', '" . $pic_1 . "', '" . $pic_2 . "', '" . $pic_3 . "', '" . $pic_4 . "'";
+                            $product_sql .= ", '" . $video_1 . "', '" . $video_2 . "')";
                             $db_conn->query($product_sql);
                             $imported_products += 1;
                         }
@@ -538,26 +625,26 @@ if ($action) {
             header('Content-Encoding: UTF-8');
             header('Content-Type: text/csv; charset=utf-8' );
             
-            $header_args = array( $_LANGUAGE['user'], $_LANGUAGE['sku_no'], $_LANGUAGE['barcode'], $_LANGUAGE['description_1'], $_LANGUAGE['description_2'], $_LANGUAGE['brand'], $_LANGUAGE['brand_sku'],
+            $header_args = array( $_LANGUAGE['sku_no'], $_LANGUAGE['barcode'], $_LANGUAGE['description_1'], $_LANGUAGE['description_2'], $_LANGUAGE['brand'], $_LANGUAGE['brand_sku'],
                 $_LANGUAGE['text_1'], $_LANGUAGE['text_2'], $_LANGUAGE['country'], $_LANGUAGE['pic_1'], $_LANGUAGE['pic_2'], $_LANGUAGE['pic_3'], $_LANGUAGE['pic_4'], $_LANGUAGE['video_1'], $_LANGUAGE['video_2'] );
 
             $products = [];
-            $products_sql = "SELECT `products`.`id`, `products`.`sku_no`, `products`.`barcode`, `products`.`description_1`, `products`.`description_2`, `products`.`brand`, `products`.`brand_sku`, `products`.`text_1`, `products`.`text_2`, `products`.`country`, `products`.`pic_1`, `products`.`pic_2`, `products`.`pic_3`, `products`.`pic_4`, `products`.`video_1`, `products`.`video_2`, `users`.`name` as 'user_name' FROM `products` LEFT JOIN `users` ON `products`.`user_id` = `users`.`id` WHERE `products`.`sku_no` != 'NULL' AND `products`.`sku_no` != '' AND `products`.`barcode` != 'NULL' AND `products`.`barcode` != ''";
+            $products_sql = "SELECT `products`.`id`, `products`.`sku_no`, `products`.`barcode`, `products`.`description_1`, `products`.`description_2`, `products`.`brand`, `products`.`brand_sku`, `products`.`text_1`, `products`.`text_2`, `products`.`country`, `products`.`pic_1`, `products`.`pic_2`, `products`.`pic_3`, `products`.`pic_4`, `products`.`video_1`, `products`.`video_2`, `users`.`name` as 'user_name' FROM `products` LEFT JOIN `users` ON `products`.`user_id` = `users`.`id` WHERE `products`.`sku_no` != 'NULL' AND `products`.`sku_no` != '' AND `products`.`barcode` != 'NULL' AND `products`.`barcode` != '' AND `products`.`user_id`='" . $_SESSION['user']['id'] . "'";
             $products_sql_result = $db_conn->query($products_sql);
             if ($products_sql_result->num_rows) {
                 while ($product_row = $products_sql_result->fetch_assoc()) {
-                    $products[] = [str_replace(";", "", $product_row['user_name']), str_replace(";", "", $product_row['sku_no']), str_replace(";", "", $product_row['barcode']), str_replace(";", "", $product_row['description_1']), str_replace(";", "", $product_row['description_2']),
-                        str_replace(";", "", $product_row['brand']), str_replace(";", "", $product_row['brand_sku']), str_replace(";", "", $product_row['text_1'], $product_row['text_2']), str_replace(";", "", $product_row['country']), 
+                    $products[] = [str_replace(";", "", $product_row['sku_no']), str_replace(";", "", $product_row['barcode']), str_replace(";", "", $product_row['description_1']), str_replace(";", "", $product_row['description_2']),
+                        str_replace(";", "", $product_row['brand']), str_replace(";", "", $product_row['brand_sku']), str_replace(";", "", $product_row['text_1']), str_replace(";", "", $product_row['text_2']), str_replace(";", "", $product_row['country']), 
                         str_replace(";", "", $product_row['pic_1']), str_replace(";", "", $product_row['pic_2']), str_replace(";", "", $product_row['pic_3']), str_replace(";", "", $product_row['pic_4']), str_replace(";", "", $product_row['video_1']), str_replace(";", "", $product_row['video_2'])];
                 }
             }
 
-            $output = fopen( ".." . DIRECTORY_SEPARATOR . $_SESSION['user']['name'] . DIRECTORY_SEPARATOR . MEDIA_PATH . DIRECTORY_SEPARATOR . EXPORT_PRODUCT, 'w' );
+            $output = fopen( ".." . DIRECTORY_SEPARATOR . $_SESSION['user']['name'] . DIRECTORY_SEPARATOR . EXPORT_PRODUCT, 'w' );
 
-            fputcsv( $output, $header_args, ";" );
-            
-            foreach( $products as $product ) {
-                fputcsv( $output, $product, ";" );
+            fputs( $output, implode(';', str_replace('"', '', $header_args)) . "\n" );
+
+            foreach( $products as $product_index => $product ) {
+                fputs( $output, ($product_index ? "\n" : "") . implode(';', str_replace('"', '', $product)) );
             }
 
             fclose( $output );
@@ -586,19 +673,24 @@ if ($action) {
             $logo_path = '';
             $has_error = false;
             if ($_POST['name']) {
-                if (!preg_match("/^[a-z]+$/i", $_POST['name'])) {
-                    $response['errors']['name'] = $_LANGUAGE['please_match'] . " " . $_LANGUAGE['name'] . " (" . "/^[a-z]+$/i" . ")";
+                if ($_POST['name'] == DOMAIN_ROOT) {
+                    $response['errors']['name'] = $_LANGUAGE['name_can_not_be_same_domain_root'];
                     $has_error = true;
                 } else {
-                    $user_name = str_replace("-", "", str_replace("_", "", str_replace(" ", "", strtolower($_POST['name']))));
-                    $users_sql = "SELECT * FROM `users` WHERE `name`='" . $user_name . "'";
-                    if ($_POST['id']) {
-                        $users_sql .= " AND `id` !='" . $_POST['id'] . "'";
-                    }
-                    $users_sql_result = $db_conn->query($users_sql);
-                    if ($users_sql_result->num_rows) {
-                        $response['errors']['name'] = $_LANGUAGE['name_already_exist'];
+                    if (!preg_match("/^[a-z]+$/i", $_POST['name'])) {
+                        $response['errors']['name'] = $_LANGUAGE['please_match'] . " " . $_LANGUAGE['name'] . " (" . "/^[a-z]+$/i" . ")";
                         $has_error = true;
+                    } else {
+                        $user_name = str_replace("-", "", str_replace("_", "", str_replace(" ", "", strtolower($_POST['name']))));
+                        $users_sql = "SELECT * FROM `users` WHERE `name`='" . $user_name . "'";
+                        if ($_POST['id']) {
+                            $users_sql .= " AND `id` !='" . $_POST['id'] . "'";
+                        }
+                        $users_sql_result = $db_conn->query($users_sql);
+                        if ($users_sql_result->num_rows) {
+                            $response['errors']['name'] = $_LANGUAGE['name_already_exist'];
+                            $has_error = true;
+                        }
                     }
                 }
             } else {
@@ -639,7 +731,7 @@ if ($action) {
                 $response['errors']['additional_info'] = $_LANGUAGE['please_input_additional_info'];
                 $has_error = true;
             } else {
-                if (strlen($_POST['additional_info']) > 500) {
+                if (mb_strlen($_POST['additional_info']) > 500) {
                     $response['errors']['additional_info'] = $_LANGUAGE['additional_info'] . ' ' . $_LANGUAGE['length_exceeded'];
                     $has_error = true;
                 }
@@ -654,9 +746,10 @@ if ($action) {
                     $response['errors']['logo'] = $_LANGUAGE['please_input_vaild_type_image'] . ' (' . join(", ", $logo_allows) . ')';
                     $has_error = true;
                 } else {
-                    $logo_path = LOGO_NAME;
-                    move_uploaded_file($_FILES['logo']['tmp_name'], ".." . DIRECTORY_SEPARATOR . $user_name . DIRECTORY_SEPARATOR . MEDIA_PATH . DIRECTORY_SEPARATOR . DIRECTORY_SEPARATOR . $logo_path);
-                    compress_image(dirname(__FILE__) . DIRECTORY_SEPARATOR . ".." . DIRECTORY_SEPARATOR . $logo_path, LOGO_MAX_WIDTH, LOGO_MAX_SIZE * 1024 * 1024, 'png');
+                    $logo_name = LOGO_NAME;
+                    $logo_path = $user_name . DIRECTORY_SEPARATOR . MEDIA_PATH . DIRECTORY_SEPARATOR . DIRECTORY_SEPARATOR . $logo_name;
+                    move_uploaded_file($_FILES['logo']['tmp_name'], ".." . DIRECTORY_SEPARATOR . $logo_path);
+                    compress_image(dirname(__FILE__) . DIRECTORY_SEPARATOR . ".." . DIRECTORY_SEPARATOR . $logo_path, LOGO_MAX_WIDTH, LOGO_MAX_SIZE * 1024 * 1024);
                 }
             } else {
                 if ($_POST['id']) {
@@ -665,13 +758,13 @@ if ($action) {
                     if ($sql_result->num_rows) {
                         $user_row = $sql_result->fetch_assoc();
                         if (!$user_row['logo']) {
-                            $logo_path = TRANSPARENT_PNG_NAME;
+                            $logo_name = TRANSPARENT_PNG_NAME;
                         } else {
-                            $logo_path = $user_row['logo'];
+                            $logo_name = $user_row['logo'];
                         }
                     }
                 } else {
-                    $logo_path = TRANSPARENT_PNG_NAME;
+                    $logo_name = TRANSPARENT_PNG_NAME;
                 }
             }
             if (!$_POST['level']) {
@@ -693,15 +786,14 @@ if ($action) {
             }
             if (!$has_error) {
                 if ($_POST['id']) {
-                    $user_sql = "UPDATE `users` SET `name`='" . $user_name . "', `email`='" . $_POST['email'] . "', `telephone_number`='" . $_POST['telephone_number'] . "', `additional_info`='" . $_POST['additional_info'] . "', `expiry_date`='" . $_POST['expiry_date'] . "', `logo`='" . $logo_path . "',";
-                    $user_sql .= " `level`='" . $_POST['level'] . "'";
+                    $user_sql = "UPDATE `users` SET `name`='" . $user_name . "', `email`='" . $_POST['email'] . "', `telephone_number`='" . $_POST['telephone_number'] . "', `additional_info`='" . $_POST['additional_info'] . "', `expiry_date`='" . $_POST['expiry_date'] . "', `logo`='" . $logo_name . "', `level`='" . $_POST['level'] . "'";
                     if ($_POST['password']) {
                         $user_sql .= ", `password` = '" . md5($_POST['password']) . "'";
                     }
                     $user_sql .= " WHERE `id` = '" . $_POST['id'] . "'";
                     $db_conn->query($user_sql);
                 } else {
-                    $user_sql = "INSERT INTO `users` (`name`, `email`, `telephone_number`, `additional_info`, `expiry_date`, `logo`, `level`, `password`) VALUES ('" . $user_name . "', '" . $_POST['email'] . "', '" . $_POST['telephone_number'] . "', '" . $_POST['additional_info'] . "', '" . $_POST['expiry_date'] . "', '" . $logo_path . "', '" . $_POST['level'] . "', '" . md5($_POST['password']) . "')";
+                    $user_sql = "INSERT INTO `users` (`name`, `email`, `telephone_number`, `additional_info`, `expiry_date`, `logo`, `level`, `password`) VALUES ('" . $user_name . "', '" . $_POST['email'] . "', '" . $_POST['telephone_number'] . "', '" . $_POST['additional_info'] . "', '" . $_POST['expiry_date'] . "', '" . $logo_name . "', '" . $_POST['level'] . "', '" . md5($_POST['password']) . "')";
                     $db_conn->query($user_sql);
                 }
                 
@@ -714,7 +806,7 @@ if ($action) {
             $sql_result = $db_conn->query($user_sql);
             if ($sql_result->num_rows) {
                 $user_row = $sql_result->fetch_assoc();
-                rmdir(".." . DIRECTORY_SEPARATOR . $user_row['user']);
+                rrmdir(".." . DIRECTORY_SEPARATOR . $user_row['name']);
             }
             $user_sql = "DELETE FROM `users` WHERE `id`='" . $_POST['id'] . "'";
             $db_conn->query($user_sql);
@@ -729,8 +821,8 @@ if ($action) {
                 $import_rows = [];
                 $open = fopen("." . DIRECTORY_SEPARATOR . $import_path, "r");
                 if (($import_open = fopen("." . DIRECTORY_SEPARATOR . $import_path, "r")) !== FALSE) {
-                    while (($import_data = fgetcsv($import_open, 1000, ";")) !== FALSE) {
-                        $import_rows[] = $import_data; 
+                    while (($import_data = fgets($import_open)) !== false) {
+                        $import_rows[] = explode(';', $import_data);
                     }
                 
                     fclose($import_open);
@@ -740,16 +832,11 @@ if ($action) {
                 foreach ($import_rows as $import_index => $import_row) {
                     $has_error = false;
                     if (!$import_index) continue;
-                    if ($import_row[0]) {
-                        $user_name = str_replace("-", "", str_replace("_", "", str_replace(" ", "", strtolower($import_row[0]))));
-                        $users_sql = "SELECT * FROM `users` WHERE `name`='" . $import_row[0] . "'";
-                        $users_sql_result = $db_conn->query($users_sql);
-                        if ($users_sql_result->num_rows) {
-                            $has_error = true;
-                        }
-                    }
-                    if ($import_row[1]) {
-                        $users_sql = "SELECT * FROM `users` WHERE `email`='" . $import_row[1] . "'";
+
+                    $name = mb_substr($import_row[0], 0, 255);
+                    if ($name) {
+                        $user_name = str_replace("-", "", str_replace("_", "", str_replace(" ", "", $name)));
+                        $users_sql = "SELECT * FROM `users` WHERE `name`='" . $name . "'";
                         $users_sql_result = $db_conn->query($users_sql);
                         if ($users_sql_result->num_rows) {
                             $has_error = true;
@@ -757,6 +844,18 @@ if ($action) {
                     } else {
                         $has_error = true;
                     }
+                    
+                    $email = mb_substr($import_row[1], 0, 255);
+                    if ($email) {
+                        $users_sql = "SELECT * FROM `users` WHERE `email`='" . $email . "'";
+                        $users_sql_result = $db_conn->query($users_sql);
+                        if ($users_sql_result->num_rows) {
+                            $has_error = true;
+                        }
+                    } else {
+                        $has_error = true;
+                    }
+                    
                     if (!$has_error) {
                         $user_dir = ".." . DIRECTORY_SEPARATOR . $user_name;
                         $user_path = realpath($user_dir);
@@ -769,24 +868,24 @@ if ($action) {
                             mkdir($user_media_dir);
                         }
                     }
-                    if (!$import_row[2]) {
+
+                    $telephone_number = mb_substr($import_row[2], 0, 255);
+                    $additional_info = mb_substr($import_row[3], 0, 500);
+                    $expiry_date = $import_row[4];
+                    if (!$expiry_date) {
                         $has_error = true;
                     }
-                    if (!$import_row[3]) {
-                        $has_error = true;
+                    $logo = $import_row[5];
+                    if (!$logo) {
+                        $logo = TRANSPARENT_PNG_NAME;
                     }
-                    if (!$import_row[4]) {
-                        $has_error = true;
-                    }
-                    if (!$import_row[6]) {
-                        $has_error = true;
-                    }
-                    if (!$import_row[7]) {
-                        $has_error = true;
+                    $level = $import_row[6];
+                    if (!$level || ($level != 'star1' && $level != 'star2' && $level != 'star3' && $level != 'star4' && $level != 'star5' && $level != 'admin')) {
+                        $level = 'star1';
                     }
                     if (!$has_error) {
-                        $user_sql = "INSERT INTO `users` (`name`, `email`, `telephone_number`, `additional_info`, `expiry_date`, `logo`, `level`, `password`) VALUES ('" . 
-                            $import_row[0] . "', '" . $import_row[1] . "', '" . $import_row[2] . "', '" . $import_row[3] . "', '" . $import_row[4] . "', '" . $import_row[5] . "', '" . $import_row[6] . "', '" . md5(IMPORT_USER_PASSWORD) . "')";
+                        $user_sql = "INSERT INTO `users` (`name`, `email`, `telephone_number`, `additional_info`, `expiry_date`, `logo`, `level`) VALUES ('" . 
+                            $name . "', '" . $email . "', '" . $telephone_number . "', '" . $additional_info . "', '" . $expiry_date . "', '" . $logo . "', '" . $level . "')";
                         $db_conn->query($user_sql);
                     }
                 }
@@ -820,10 +919,10 @@ if ($action) {
 
             $output = fopen( 'php://output', 'w' );
 
-            fputcsv( $output, $header_args, ";" );
+            fputs( $output, implode(';', str_replace('"', '', $header_args)) ."\n" );
 
-            foreach( $users as $user ) {
-                fputcsv( $output, $user, ";" );
+            foreach( $users as $user_index => $user ) {
+                fputs( $output, ($user_index ? "\n" : "") . implode(';', str_replace('"', '', $user)) );
             }
 
             fclose( $output );

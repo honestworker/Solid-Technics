@@ -21,6 +21,7 @@
     <link rel="stylesheet" href="<?php echo DOMAIN_NAME . DIRECTORY_SEPARATOR . DOMAIN_ROOT; ?>/assets/css/colors.css">
     <link rel="stylesheet" href="<?php echo DOMAIN_NAME . DIRECTORY_SEPARATOR . DOMAIN_ROOT; ?>/assets/css/spectrum.min.css">
     <link rel="stylesheet" href="<?php echo DOMAIN_NAME . DIRECTORY_SEPARATOR . DOMAIN_ROOT; ?>/assets/css/colors-12.css">
+    <link rel="stylesheet" href="<?php echo DOMAIN_NAME . DIRECTORY_SEPARATOR . DOMAIN_ROOT; ?>/assets/icon-captcha/css/icon-captcha.min.css">
     <link rel="stylesheet" href="<?php echo DOMAIN_NAME . DIRECTORY_SEPARATOR . DOMAIN_ROOT; ?>/assets/css/style.css?v=<?php echo time(); ?>">
 
     <script type="text/javascript">
@@ -33,25 +34,25 @@
 </head>
 
 <body id="page-top" class="pm-body d-flex flex-column justify-content-between min-vh-100 inlinethumbs unlogged pt-5 header-below">
-    <div class="position-absolute w-100 h-100 start-0 top-0 d-flex align-items-center justify-content-center page-spinner">
-        <div class="spinner-border" role="status">
-            <span class="visually-hidden">Loading...</span>
-        </div>
+    <div class="position-absolute w-100 h-100 start-0 top-0 botom-0 d-flex flex-sm-column align-items-center justify-content-center page-spinner">
+        <div class="spinner-message"></div>
+        <div class="spinner-border" role="status"></div>
     </div>
     <nav class="navbar bg-dark navbar-expand-lg shadow fixed-top">
         <div class="container">
             <a class="navbar-brand" href="<?php echo DOMAIN_NAME . DIRECTORY_SEPARATOR . DOMAIN_ROOT; ?>">
-                <?php if (isset($_SESSION["user"]) && $_SESSION["user"]['logo']) { ?>
-                    <img src="<?php echo DOMAIN_NAME . DIRECTORY_SEPARATOR . $_SESSION["user"]['logo']; ?>" class="h-px-50" />
-                <?php } else { ?>
-                    <img src="<?php echo DOMAIN_NAME . DIRECTORY_SEPARATOR . DOMAIN_ROOT; ?>/assets/img/logo/logo.png" class="h-px-50" />
-                <?php } ?>
+                <img src="<?php echo DOMAIN_NAME . DIRECTORY_SEPARATOR . DOMAIN_ROOT; ?>/assets/img/logo/logo.png" class="" />
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-pm-menu" aria-controls="collapse-pm-menu" aria-expanded="false" aria-label="Toggle navigation">
                 <i class="bi bi-list"></i>
             </button>
             <div class="collapse navbar-collapse" id="collapse-pm-menu">
                 <ul class="navbar-nav ms-auto" data-level="<?php echo $_SESSION["user"]['level']; ?>">
+                    <?php if (isset($_SESSION["user"]) && $_SESSION["user"]['logo']) { ?>
+                        <li class="nav-item">
+                            <img src="<?php echo DOMAIN_NAME . DIRECTORY_SEPARATOR . $_SESSION["user"]['logo']; ?>?v=<?php echo time(); ?>" class="" />
+                        </li>
+                    <?php } ?>
                     <?php if (isset($_SESSION["user"]) && $_SESSION["user"]['level'] == 'admin') { ?>
                         <li class="nav-item">
                             <a class="nav-link" href="<?php echo DOMAIN_NAME . DIRECTORY_SEPARATOR . DOMAIN_ROOT; ?>/users.php">
@@ -61,13 +62,18 @@
                     <?php } ?>
                     <?php if (isset($_SESSION["user"])) { ?>
                         <li class="nav-item">
+                            <a class="nav-link" href="<?php echo DOMAIN_NAME . DIRECTORY_SEPARATOR . DOMAIN_ROOT; ?>">
+                                <?php echo $_LANGUAGE['products']; ?>
+                            </a>
+                        </li>
+                        <li class="nav-item">
                             <a class="nav-link btn-import-product" role="button">
                                 <?php echo $_LANGUAGE['import']; ?>
                             </a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link btn-export-product" role="button">
-                                <?php echo $_LANGUAGE['export']; ?>
+                                <?php echo $_LANGUAGE['export_to_app']; ?>
                             </a>
                         </li>
                     <?php } ?>
@@ -93,7 +99,6 @@
                     <?php } ?>
                     <li class="dropdown nav-item">
                         <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown" role="button" aria-expanded="true">
-                            <i class="bi bi-flag"></i>
                             <i class="flag-icon flag-icon-<?php echo lang_to_country($lang); ?>"></i>
                             <span class="caret"></span>
                         </a>
@@ -111,6 +116,6 @@
             </form>
         </div>
     </nav>
-    <div class="container mb-auto pt-3">
+    <div class="mb-auto pt-3">
         <div class="main-content row">
             <section class="col-12 my-5">

@@ -5,7 +5,6 @@
 <?php include './includes/header.php'; ?>
 
 <?php
-
 $products_sql = "SELECT `products`.`id`, `products`.`sku_no`, `products`.`barcode`, `products`.`description_1`, `products`.`description_2`, `products`.`brand`, `products`.`brand_sku`, `products`.`text_1`, `products`.`text_2`, `products`.`country`, `products`.`pic_1`, `products`.`pic_2`, `products`.`pic_3`, `products`.`pic_4`, `products`.`video_1`, `products`.`video_2`, `users`.`name` as 'user_name' FROM `products` LEFT JOIN `users` ON `products`.`user_id` = `users`.`id`";
 if ($_SESSION["user"]['level'] != 'admin') {
     $products_sql .= " WHERE `users`.`id` = '" . $_SESSION["user"]['id'] . "'";
@@ -26,7 +25,9 @@ $products_sql_result = $db_conn->query($products_sql);
             <table id="dataTable" class="w-100 table listview dataTable no-footer" style="width:100%">
                 <thead>
                     <tr>
-                        <th><span class="sorta"><?php echo $_LANGUAGE['user'] ?></span></th>
+                        <?php if ($_SESSION['user']['level'] == 'admin') { ?>
+                            <th><span class="sorta"><?php echo $_LANGUAGE['user'] ?></span></th>
+                        <?php } ?>
                         <th><span class="sorta"><?php echo $_LANGUAGE['sku_no'] ?></span></th>
                         <th><span class="sorta"><?php echo $_LANGUAGE['barcode'] ?></span></th>
                         <th><?php echo $_LANGUAGE['description_1'] ?></th>
@@ -50,16 +51,18 @@ $products_sql_result = $db_conn->query($products_sql);
                         if ($products_sql_result->num_rows) {
                             while ($product = $products_sql_result->fetch_assoc()) { ?>
                                 <tr data-id="<?php echo $product['id'] ?>">
-                                    <td><?php echo $product['user_name'] ?></td>
+                                    <?php if ($_SESSION['user']['level'] == 'admin') { ?>
+                                        <td><?php echo $product['user_name'] ?></td>
+                                    <?php } ?>
                                     <td><?php echo $product['sku_no'] ?></td>
-                                    <td><?php echo $product['barcode'] ?></td>
-                                    <td><?php echo $product['description_1'] ?></td>
-                                    <td><?php echo $product['description_2'] ?></td>
-                                    <td><?php echo $product['brand'] ?></td>
-                                    <td><?php echo $product['brand_sku'] ?></td>
-                                    <td><?php echo substr($product['text_1'], 0, 20) ?></td>
-                                    <td><?php echo substr($product['text_2'], 0, 20) ?></td>
-                                    <td><?php echo $product['country'] ?></td>
+                                    <td><?php echo mb_substr($product['barcode'], 0, 20) ?></td>
+                                    <td><?php echo mb_substr($product['description_1'], 0, 10) ?></td>
+                                    <td><?php echo mb_substr($product['description_2'], 0, 10) ?></td>
+                                    <td><?php echo mb_substr($product['brand'], 0, 10) ?></td>
+                                    <td><?php echo mb_substr($product['brand_sku'], 0, 10) ?></td>
+                                    <td><?php echo mb_substr($product['text_1'], 0, 10) ?></td>
+                                    <td><?php echo mb_substr($product['text_2'], 0, 10) ?></td>
+                                    <td><?php echo mb_substr($product['country'], 0, 10) ?></td>
                                     <td><?php if ($product['pic_1']) { ?><img class="w-100-p" src="<?php echo DOMAIN_NAME . DIRECTORY_SEPARATOR ?><?php if ($product['pic_1'] == TRANSPARENT_PNG_NAME) { echo DOMAIN_ROOT . DIRECTORY_SEPARATOR . TRANSPARENT_PNG_PATH . DIRECTORY_SEPARATOR . TRANSPARENT_PNG_NAME; } else { echo $product['user_name'] . DIRECTORY_SEPARATOR . MEDIA_PATH . DIRECTORY_SEPARATOR . $product['pic_1']; } ?>" /><?php } ?></td>
                                     <td><?php if ($product['pic_2']) { ?><img class="w-100-p" src="<?php echo DOMAIN_NAME . DIRECTORY_SEPARATOR ?><?php if ($product['pic_2'] == TRANSPARENT_PNG_NAME) { echo DOMAIN_ROOT . DIRECTORY_SEPARATOR . TRANSPARENT_PNG_PATH . DIRECTORY_SEPARATOR . TRANSPARENT_PNG_NAME; } else { echo $product['user_name'] . DIRECTORY_SEPARATOR . MEDIA_PATH . DIRECTORY_SEPARATOR . $product['pic_2']; } ?>" /><?php } ?></td>
                                     <td><?php if ($product['pic_3']) { ?><img class="w-100-p" src="<?php echo DOMAIN_NAME . DIRECTORY_SEPARATOR ?><?php if ($product['pic_3'] == TRANSPARENT_PNG_NAME) { echo DOMAIN_ROOT . DIRECTORY_SEPARATOR . TRANSPARENT_PNG_PATH . DIRECTORY_SEPARATOR . TRANSPARENT_PNG_NAME; } else { echo $product['user_name'] . DIRECTORY_SEPARATOR . MEDIA_PATH . DIRECTORY_SEPARATOR . $product['pic_3']; } ?>" /><?php } ?></td>
@@ -80,6 +83,11 @@ $products_sql_result = $db_conn->query($products_sql);
     </div>
 </div>
 
+<div class="row">
+    <div class="col-sm-12">
+    </div>
+</div>
+
 <div class="modal fade show" id="ProductModal" tabindex="-1" aria-modal="true" role="dialog">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -90,7 +98,7 @@ $products_sql_result = $db_conn->query($products_sql);
             <div class="modal-body">
                 <form autocomplete="off" role="form" method="post">
                     <input readonly="" name="id" type="hidden">
-                    <div class="form-group mb-3 name">
+                    <div class="form-group mb-3 sku_no">
                         <label for="sku_no" class="form-label"><?php echo $_LANGUAGE['sku_no'] ?></label>
                         <input
                             type="text"
@@ -112,9 +120,9 @@ $products_sql_result = $db_conn->query($products_sql);
                             class="form-control"
                             id="barcode"
                             name="barcode"
-                            placeholder="^[0-9]{1,20}$"
-                            pattern="^[0-9]{1,20}$"
-                            maxlength="20"
+                            placeholder="^[0-9]{1,30}$"
+                            pattern="^[0-9]{1,30}$"
+                            maxlength="30"
                             autocomplete="false"
                             required
                         />
@@ -127,7 +135,7 @@ $products_sql_result = $db_conn->query($products_sql);
                             id="description_1"
                             name="description_1"
                             pattern="^[^;]+$"
-                            maxlength="20"
+                            maxlength="30"
                             required
                         />
                     </div>
@@ -139,7 +147,7 @@ $products_sql_result = $db_conn->query($products_sql);
                             id="description_2"
                             name="description_2"
                             pattern="^[^;]+$"
-                            maxlength="20"
+                            maxlength="30"
                             required
                         />
                     </div>
@@ -151,7 +159,7 @@ $products_sql_result = $db_conn->query($products_sql);
                             id="brand"
                             name="brand"
                             pattern="^[^;]+$"
-                            maxlength="20"
+                            maxlength="30"
                             required
                         />
                     </div>
@@ -163,7 +171,7 @@ $products_sql_result = $db_conn->query($products_sql);
                             id="brand_sku"
                             name="brand_sku"
                             pattern="^[^;]+$"
-                            maxlength="20"
+                            maxlength="30"
                             required
                         />
                     </div>
@@ -197,7 +205,7 @@ $products_sql_result = $db_conn->query($products_sql);
                             id="country"
                             name="country"
                             pattern="^[^;]+$"
-                            maxlength="10"
+                            maxlength="20"
                             required
                         />
                     </div>
@@ -254,6 +262,7 @@ $products_sql_result = $db_conn->query($products_sql);
                             name="video_1"
                             accept="video/mp4"
                         />
+                        <img src="<?php echo DOMAIN_NAME . DIRECTORY_SEPARATOR . DOMAIN_ROOT . DIRECTORY_SEPARATOR . TRANSPARENT_PNG_PATH . DIRECTORY_SEPARATOR . TRANSPARENT_PNG_NAME ?>" class="w-30-p mt-2 d-none" />
                         <video src="" class="w-200-p mt-2 d-none"></video>
                     </div>
                     <div class="form-group mb-3 video_2">
@@ -265,6 +274,7 @@ $products_sql_result = $db_conn->query($products_sql);
                             name="video_2"
                             accept="video/mp4"
                         />
+                        <img src="<?php echo DOMAIN_NAME . DIRECTORY_SEPARATOR . DOMAIN_ROOT . DIRECTORY_SEPARATOR . TRANSPARENT_PNG_PATH . DIRECTORY_SEPARATOR . TRANSPARENT_PNG_NAME ?>" class="w-30-p mt-2 d-none" />
                         <video src="" class="w-200-p mt-2 d-none"></video>
                     </div>
                     <div class="mb-3">

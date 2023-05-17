@@ -1,5 +1,12 @@
 <?php include './includes/init.php'; ?>
 
+<?php
+    if (!isset($_SESSION['user']) || $_SESSION['user']['level'] != 'admin') {
+        echo("<script>location.href = '" . DOMAIN_NAME . DIRECTORY_SEPARATOR . DOMAIN_ROOT . DIRECTORY_SEPARATOR . "';</script>");
+        die;
+    }
+?>
+
 <?php $page_title = $_LANGUAGE['users']; ?>
 
 <?php include './includes/header.php'; ?>
@@ -70,7 +77,7 @@
                                 <tr data-id="<?php echo $user['id'] ?>">
                                     <td><?php echo $user['name'] ?></td>
                                     <td><?php echo $user['email'] ?></td>
-                                    <td><?php echo substr($user['additional_info'], 0, 20) ?></td>
+                                    <td><?php echo mb_substr($user['additional_info'], 0, 20) ?></td>
                                     <td><?php if ($user['expiry_date']) { echo date("m/d/Y", strtotime($user['expiry_date'])); } ?></td>
                                     <td><?php if ($user['logo']) { ?><img class="w-100-p" src="<?php echo DOMAIN_NAME . DIRECTORY_SEPARATOR ?><?php if ($user['logo'] == TRANSPARENT_PNG_NAME) { echo DOMAIN_ROOT . DIRECTORY_SEPARATOR . TRANSPARENT_PNG_PATH . DIRECTORY_SEPARATOR . TRANSPARENT_PNG_NAME; } else { echo $user['name'] . DIRECTORY_SEPARATOR . MEDIA_PATH . DIRECTORY_SEPARATOR . $user['logo']; } ?>?v=<?php echo time() ?>" /><?php } ?></td>
                                     <td><?php echo $_LANGUAGE[$user['level']] ?></td>
@@ -139,14 +146,15 @@
                     </div>
                     <div class="form-group mb-3 additional_info">
                         <label for="additional_info" class="form-label"><?php echo $_LANGUAGE['additional_info'] ?></label>
-                        <textarea
+                        <input
+                            type="text"
                             class="form-control"
                             id="additional_info"
                             name="additional_info"
                             placeholder="<?php echo $_LANGUAGE['additional_info'] ?>"
                             maxlength="500"
                             required
-                        ></textarea>
+                        />
                     </div>
                     <div class="form-group mb-3 expiry_date">
                         <label for="expiry_date" class="form-label"><?php echo $_LANGUAGE['expiry_date'] ?></label>
