@@ -15,7 +15,14 @@ if (!function_exists('get_env')) {
                         $env_value = $env_pairs[1];
                     }
                     if ($env_key == $env_name) {
-                        return str_replace('/^"/', '', str_replace('/"$/', '', $env_value));
+                        $env_value = str_replace('/^"/', '', str_replace('/"$/', '', $env_value));
+                        if (is_string($env_value) && strtoupper($env_value) == 'TRUE') {
+                            return true;
+                        }
+                        if (is_string($env_value) && strtoupper($env_value) == 'FALSE') {
+                            return false;
+                        }
+                        return $env_value;
                     }
                 }
             }
@@ -118,16 +125,17 @@ if (!function_exists('compress_image')) {
                             $new_image = imagecreatefromjpeg($image);
                     }
                 
-                    imagecopyresampled($transparent_image, $new_image, 0, 0, 0, 0, $width, $height, $width, $height);                    
+                    imagecopyresampled($transparent_image, $new_image, 0, 0, 0, 0, $width, $height, $width, $height);
+                    $image_ratio = (int)($max_size / $image_size * 100);
                     switch($info['mime']) {
                         case 'image/jpeg':
-                            imagejpeg($transparent_image, $image, $max_size / $image_size * 100);
+                            imagejpeg($transparent_image, $image, $image_ratio);
                             break;
                         case 'image/png':
-                            imagepng($transparent_image, $image, $max_size / $image_size * 100);
+                            imagepng($transparent_image, $image, $image_ratio);
                             break;
                         default:
-                            imagejpeg($transparent_image, $image, $max_size / $image_size * 100);
+                            imagejpeg($transparent_image, $image, $image_ratio);
                     }
                 }
             }
@@ -148,7 +156,7 @@ if (!function_exists('lang_to_country')) {
             'zh' => 'cn',
         ];
 
-        return isset($lang_country_codes[$lang]) ? $lang_country_codes[$lang] : 'us';
+        return isset($lang_country_codes[$lang]) ? $lang_country_codes[$lang] : $lang;
     }
 }
 
@@ -201,7 +209,7 @@ if (!function_exists('get_media_name')) {
 }
 
 if (!function_exists('check_product_media')) {
-    function check_product_media() {
+    function check_product_media($db_conn) {
         $products_sql = "SELECT `products`.`id`, `products`.`pic_1`, `products`.`pic_2`, `products`.`pic_3`, `products`.`pic_4`, `products`.`video_1`, `products`.`video_2`, `users`.`name` as 'user_name' FROM `products` LEFT JOIN `users` ON `products`.`user_id` = `users`.`id`";
         $products_sql_result = $db_conn->query($products_sql);
         $products[] = [];
@@ -240,6 +248,15 @@ if (!function_exists('check_product_media')) {
             $product_sql .= " WHERE `id` = '" . $product['id'] . "'";
             $db_conn->query($product_sql);
         }
+    }
+}
+
+if(!function_exists("mime_content_type"))
+{
+    function mime_content_type($file)
+    {
+        $open_bit = finfo_open(FILEINFO_MIME_TYPE);
+        return finfo_file($open_bit, $file);
     }
 }
 

@@ -5,6 +5,7 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
 
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <meta name="description" content="">
     <meta name="author" content="">
@@ -47,7 +48,7 @@
                 <i class="bi bi-list"></i>
             </button>
             <div class="collapse navbar-collapse" id="collapse-pm-menu">
-                <ul class="navbar-nav ms-auto" data-level="<?php echo $_SESSION["user"]['level']; ?>">
+                <ul class="navbar-nav ms-auto" data-level="<?php echo (isset($_SESSION["user"]) ? $_SESSION["user"]['level'] : ''); ?>">
                     <?php if (isset($_SESSION["user"]) && $_SESSION["user"]['logo']) { ?>
                         <li class="nav-item">
                             <img src="<?php echo DOMAIN_NAME . DIRECTORY_SEPARATOR . $_SESSION["user"]['logo']; ?>?v=<?php echo time(); ?>" class="" />

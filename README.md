@@ -10,8 +10,7 @@
     - DB_NAME: Database name  
     - DB_USER: Database user name  
     - DB_PASSWORD: Database user password  
-- After installation, you can login as admin with this credential.  
-    - name: admin, password: password
+
 
 ## Configuration
 - If you want the change the configuration, please open .env file and edit it.  

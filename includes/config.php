@@ -10,6 +10,8 @@ define('DB_NAME', get_env('DB_NAME'));
 define('DB_USER', get_env('DB_USER'));
 define('DB_PASSWORD', get_env('DB_PASSWORD'));
 
+define('CAPTCHA_ENABLE', get_env('CAPTCHA_ENABLE'));
+
 define('MEDIA_PATH', get_env('MEDIA_PATH'));
 define('UPLOADS_PATH', get_env('UPLOADS_PATH'));
 

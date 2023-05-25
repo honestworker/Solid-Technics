@@ -446,7 +446,7 @@ if ($action) {
                 $product_row = $products_sql_result->fetch_assoc();
                 if ($product_row['pic_1']) {
                     if ($product_row['pic_1'] != TRANSPARENT_PNG_NAME) {
-                        $pic_1_products_sql = "SELECT * FROM `products` WHERE `pic_1`='" . $product_row['pic_1'] . "' AND `id`!='" . $_POST['id'] . "' AND `user_id=`'" . $product['user_id'] . "'";
+                        $pic_1_products_sql = "SELECT * FROM `products` WHERE `pic_1`='" . $product_row['pic_1'] . "' AND `id`!='" . $_POST['id'] . "' AND `user_id`='" . $product_row['user_id'] . "'";
                         $pic_1_products_sql_result = $db_conn->query($pic_1_products_sql);
                         if (!$pic_1_products_sql_result->num_rows) {
                             unlink(".." . DIRECTORY_SEPARATOR . $product_row['user_name'] . DIRECTORY_SEPARATOR . MEDIA_PATH . DIRECTORY_SEPARATOR . $product_row['pic_1']);
@@ -455,7 +455,7 @@ if ($action) {
                 }
                 if ($product_row['pic_2']) {
                     if ($product_row['pic_2'] != TRANSPARENT_PNG_NAME) {
-                        $pic_2_products_sql = "SELECT * FROM `products` WHERE `pic_2`='" . $product_row['pic_2'] . "' AND `id`!='" . $_POST['id'] . "' AND `user_id=`'" . $product['user_id'] . "'";
+                        $pic_2_products_sql = "SELECT * FROM `products` WHERE `pic_2`='" . $product_row['pic_2'] . "' AND `id`!='" . $_POST['id'] . "' AND `user_id`='" . $product_row['user_id'] . "'";
                         $pic_2_products_sql_result = $db_conn->query($pic_2_products_sql);
                         if (!$pic_2_products_sql_result->num_rows) {
                             unlink(".." . DIRECTORY_SEPARATOR . $product_row['user_name'] . DIRECTORY_SEPARATOR . MEDIA_PATH . DIRECTORY_SEPARATOR . $product_row['pic_2']);
@@ -464,7 +464,7 @@ if ($action) {
                 }
                 if ($product_row['pic_3']) {
                     if ($product_row['pic_3'] != TRANSPARENT_PNG_NAME) {
-                        $pic_3_products_sql = "SELECT * FROM `products` WHERE `pic_3`='" . $product_row['pic_3'] . "' AND `id`!='" . $_POST['id'] . "' AND `user_id=`'" . $product['user_id'] . "'";
+                        $pic_3_products_sql = "SELECT * FROM `products` WHERE `pic_3`='" . $product_row['pic_3'] . "' AND `id`!='" . $_POST['id'] . "' AND `user_id`='" . $product_row['user_id'] . "'";
                         $pic_3_products_sql_result = $db_conn->query($pic_3_products_sql);
                         if (!$pic_3_products_sql_result->num_rows) {
                             unlink(".." . DIRECTORY_SEPARATOR . $product_row['user_name'] . DIRECTORY_SEPARATOR . MEDIA_PATH . DIRECTORY_SEPARATOR . $product_row['pic_3']);
@@ -473,7 +473,7 @@ if ($action) {
                 }
                 if ($product_row['pic_4']) {
                     if ($product_row['pic_4'] != TRANSPARENT_PNG_NAME) {
-                        $pic_4_products_sql = "SELECT * FROM `products` WHERE `pic_4`='" . $product_row['pic_4'] . "' AND `id`!='" . $_POST['id'] . "' AND `user_id=`'" . $product['user_id'] . "'";
+                        $pic_4_products_sql = "SELECT * FROM `products` WHERE `pic_4`='" . $product_row['pic_4'] . "' AND `id`!='" . $_POST['id'] . "' AND `user_id`='" . $product_row['user_id'] . "'";
                         $pic_4_products_sql_result = $db_conn->query($pic_4_products_sql);
                         if (!$pic_4_products_sql_result->num_rows) {
                             unlink(".." . DIRECTORY_SEPARATOR . $product_row['user_name'] . DIRECTORY_SEPARATOR . MEDIA_PATH . DIRECTORY_SEPARATOR . $product_row['pic_4']);
@@ -481,14 +481,14 @@ if ($action) {
                     }
                 }
                 if ($product_row['video_1']) {
-                    $video_1_products_sql = "SELECT * FROM `products` WHERE `video_1`='" . $product_row['video_1'] . "' AND `id`!='" . $_POST['id'] . "' AND `user_id=`'" . $product['user_id'] . "'";
+                    $video_1_products_sql = "SELECT * FROM `products` WHERE `video_1`='" . $product_row['video_1'] . "' AND `id`!='" . $_POST['id'] . "' AND `user_id`='" . $product_row['user_id'] . "'";
                     $video_1_products_sql_result = $db_conn->query($video_1_products_sql);
                     if (!$video_1_products_sql_result->num_rows) {
                         unlink(".." . DIRECTORY_SEPARATOR . $product_row['user_name'] . DIRECTORY_SEPARATOR . MEDIA_PATH . DIRECTORY_SEPARATOR . $product_row['video_1']);
                     }
                 }
                 if ($product_row['video_2']) {
-                    $video_2_products_sql = "SELECT * FROM `products` WHERE `video_2`='" . $product_row['video_2'] . "' AND `id`!='" . $_POST['id'] . "' AND `user_id=`'" . $product['user_id'] . "'";
+                    $video_2_products_sql = "SELECT * FROM `products` WHERE `video_2`='" . $product_row['video_2'] . "' AND `id`!='" . $_POST['id'] . "' AND `user_id`='" . $product_row['user_id'] . "'";
                     $video_2_products_sql_result = $db_conn->query($video_2_products_sql);
                     if (!$video_2_products_sql_result->num_rows) {
                         unlink(".." . DIRECTORY_SEPARATOR . $product_row['user_name'] . DIRECTORY_SEPARATOR . MEDIA_PATH . DIRECTORY_SEPARATOR . $product_row['video_2']);
@@ -524,7 +524,7 @@ if ($action) {
                     if (!$import_index) continue;
                     if (count($import_row) != 15) continue;
 
-                    $sku_no = mb_substr($import_row[0], 0, 10);
+                    $sku_no = substr($import_row[0], 0, 10);
                     if (!$sku_no || !preg_match("/^[0-9a-zA-Z_-]{1,10}$/i", $sku_no)) {
                         $has_error = true;
                     } else {
@@ -536,7 +536,7 @@ if ($action) {
                         }
                     }
                     
-                    $barcode = mb_substr($import_row[0], 0, 30);
+                    $barcode = substr($import_row[0], 0, 30);
                     if (!$barcode || !preg_match("/^[0-9]{1,30}$/i", $barcode)) {
                         $has_error = true;
                     } else {

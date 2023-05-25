@@ -4,23 +4,26 @@
 
 <?php include './includes/header.php'; ?>
 
-<?php
-    use IconCaptcha\IconCaptcha;
-    IconCaptcha::options([
-        'iconPath' => __DIR__ . '/assets/icon-captcha/icons/', // required
-        'attempts' => [
-            'amount' => 3,
-            'timeout' => 60 // seconds.
-        ],
-    ]);
-
+<?php    
     $errors = [];
     $has_error = false;
-    // If the form has been submitted, validate the captcha.
-    if (!empty($_POST)) {
-        if (!IconCaptcha::validateSubmission($_POST)) {
-            $has_error = true;
-            $errors['captcha'] = IconCaptcha::getErrorMessage();
+
+    use IconCaptcha\IconCaptcha;
+    if (CAPTCHA_ENABLE) {
+        IconCaptcha::options([
+            'iconPath' => __DIR__ . '/assets/icon-captcha/icons/', // required
+            'attempts' => [
+                'amount' => 3,
+                'timeout' => 60 // seconds.
+            ],
+        ]);
+
+        // If the form has been submitted, validate the captcha.
+        if (!empty($_POST)) {
+            if (!IconCaptcha::validateSubmission($_POST)) {
+                $has_error = true;
+                $errors['captcha'] = IconCaptcha::getErrorMessage();
+            }
         }
     }
 ?>
@@ -107,13 +110,15 @@
                             <p class="text-danger small"><?php echo $errors['password'] ?></p>
                         <?php } ?>
                     </div>
-                    <div class="mb-3">
-                        <input type="hidden" name="_iconcaptcha-token" value="<?php echo IconCaptcha::token() ?>"/>
-                        <div class="iconcaptcha-holder" data-theme="light"></div>
-                        <?php if (isset($errors['captcha'])) { ?>
-                            <p class="text-danger small"><?php echo $errors['captcha'] ?></p>
-                        <?php } ?>
-                    </div>
+                    <?php if (CAPTCHA_ENABLE) { ?>
+                        <div class="mb-3">
+                            <input type="hidden" name="_iconcaptcha-token" value="<?php echo IconCaptcha::token() ?>"/>
+                            <div class="iconcaptcha-holder" data-theme="light"></div>
+                            <?php if (isset($errors['captcha'])) { ?>
+                                <p class="text-danger small"><?php echo $errors['captcha'] ?></p>
+                            <?php } ?>
+                        </div>
+                    <?php } ?>
                     <div class="mb-3">
                         <button class="btn btn-primary d-grid w-100" type="submit"><?php echo $_LANGUAGE['login'] ?></button>
                     </div>

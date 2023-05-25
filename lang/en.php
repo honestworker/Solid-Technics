@@ -75,6 +75,7 @@ $_LANGUAGE = [
     'import_users' => 'Import Users',
     'confirm_import_users' => 'Do you want to imoprt the users?',
     'used' => 'used',
+    'max_size' => 'Max Size',
 
     'name' => 'Name',
     'enter_your_name' => 'Enter your name',
@@ -96,6 +97,7 @@ $_LANGUAGE = [
     'please_upload_logo' => 'Please upload logo',
     'level' => 'Level',
     'please_select_level' => 'Please select level',
+    'consumption' => 'Consumption',
     'information' => 'Information',
     'please_input_information' => 'Please input information',
     'does_not_match_password' => 'Password does not match with confirm password',
